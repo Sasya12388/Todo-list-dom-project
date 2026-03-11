@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dom Concept Demo</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #header{
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        #taskInput{
+            width: 300px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        #addButton{
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #addButton:hover{
+            background-color: #45a049;
+        }
+        #taskList{
+            list-style-type: none;
+            padding-left: 0;
+        }
+        #taskList li{
+            background-color: #f9f9f9;
+            margin-bottom: 5px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <form>
+    <header id="header">
+        <h1 id="heading">To-Do List</h1>
+    </header>
+    <input type="text" id="taskInput" placeholder="Enter the task">
+    <button id="addButton" type="button">Add Task</button>
+    <br>
+    <h2>Tasks</h2>
+    <ul  id="taskList">
+        <!--Tasks will be dynamically added here-->
+    </ul>
+    <script>
+        //selecting DOM elements we are accessing the elements by their id
+        const taskInput = document.getElementById('taskInput');
+        const addButton = document.getElementById('addButton');
+        const taskList = document.getElementById('taskList');
+        
+
+        // Dom contains various methods and properties that allow us to manipulate the structure, style, and content of a web page. It provides a way to interact with HTML elements, modify their attributes, and respond to user interactions.
+
+        //events: Events are  actions that occur in the browser, such as clicks, key presses, or form submissions. We can listen for these events and respond to them using event listeners.
+
+        //event listeners:adding a new task to the list when the button is clicked
+
+       // event handler: a function that will be called when the event occurs. It defines what should happen in response to the event.
+
+        //addEventListener(event,event handler);
+
+       taskInput.addEventListener('keypress',(event)=>{
+        if(event.key === 'Enter'){
+            event.preventDefault();
+            addButton.click();
+        }
+       })
+
+        addButton.addEventListener('click',
+        //event handler
+        ()=>{
+            const tasktext = taskInput.value.trim();
+            console.log("Task text:", tasktext);
+            if(tasktext===""){
+                alert("Please enter a task");
+                return;
+            }
+            //creating a new list item for the task
+            const listItem = document.createElement('li');
+
+            //create a span to hold the task text
+            const taskSpan=document.createElement('span');
+            taskSpan.textContent=tasktext;
+
+            //create a delete button for the task
+            const deleteButton=document.createElement('button');
+            deleteButton.textContent='Delete';
+            deleteButton.style.color='red';
+            deleteButton.style.marginLeft='10px';
+
+            //Event Listener : deleting the task when the delete button is clicked
+            deleteButton.addEventListener('click',
+                ()=>{
+                    taskList.removeChild(listItem);
+                    saveTasks();
+                }
+            );
+           
+            //Adding check box to mark the task as completed
+            const checkBox =document.createElement('input');
+            checkBox.type='checkbox';
+            checkBox.style.marginRight='10px';
+
+           //checkbox event listener: mark the task as completed when the checkbox is checked
+           checkBox.addEventListener('change',()=>{
+            if(checkBox.checked){
+                taskSpan.style.textDecoration='line-through';
+                taskSpan.style.color='gray';
+            }
+            else{
+                taskSpan.style.textDecoration='none';
+                taskSpan.style.color='black';
+            }
+
+           });
+
+            //append the task text and delete button to the list item
+            listItem.appendChild(checkBox); 
+            listItem.appendChild(taskSpan);
+            listItem.appendChild(deleteButton);
+             
+
+            //append the list item to the task list
+            taskList.appendChild(listItem);
+            saveTasks();
+            //clear the input field after adding the task
+           taskInput.value='';
+
+        });
+        function saveTasks() {
+        const tasks = [];
+    
+            document.querySelectorAll("#taskList li span").forEach(task => {
+            tasks.push(task.textContent);
+     });
+
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+
+    //local storage: Local storage is a web storage mechanism that allows you to store data in the browser. It provides a way to save key-value pairs, and the data persists even after the browser is closed. In this code, we use local storage to save the list of tasks so that they can be retrieved when the page is reloaded.
+    // loading tasks from local storage when the page loads
+    window.onload = function() {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    tasks.forEach(task => {
+
+        const listItem = document.createElement("li");
+
+        // create checkbox
+        const checkBox = document.createElement("input");
+        checkBox.type = "checkbox";
+        checkBox.style.marginRight = "10px";
+
+        // create task text
+        const taskSpan = document.createElement("span");
+        taskSpan.textContent = task;
+
+        // create delete button
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.style.color = "red";
+        deleteButton.style.marginLeft = "10px";
+
+        // delete event
+        deleteButton.addEventListener("click", ()=>{
+            taskList.removeChild(listItem);
+            saveTasks();
+        });
+
+        // checkbox event
+        checkBox.addEventListener("change", ()=>{
+            if(checkBox.checked){
+                taskSpan.style.textDecoration = "line-through";
+                taskSpan.style.color = "gray";
+            } else {
+                taskSpan.style.textDecoration = "none";
+                taskSpan.style.color = "black";
+            }
+        });
+
+        listItem.appendChild(checkBox);
+        listItem.appendChild(taskSpan);
+        listItem.appendChild(deleteButton);
+
+        taskList.appendChild(listItem);
+    });
+};
+    </script>
+    </form>
+</body>
+</html>
